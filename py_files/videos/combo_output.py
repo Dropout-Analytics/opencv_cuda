@@ -10,11 +10,10 @@ def preprocess(video):
     fps = vod.get(cv.CAP_PROP_FPS)
     n_frames = vod.get(cv.CAP_PROP_FRAME_COUNT)
 
-    out = cv.VideoWriter('../../media/combo_output.avi', cv.VideoWriter_fourcc(*'MJPG'), fps, (540, 640))
-
     # read the first frame
     ret, frame = vod.read()
-    i=0
+
+    scale = 0.25
 
     # was first frame read successfully? (ret == True)
     if ret:
@@ -31,7 +30,7 @@ def preprocess(video):
             # do stuff
             try:
 
-                resized = cv.cuda.resize(gpu_frame, (int(1280 * 0.25), int(720 * 0.25)))
+                resized = cv.cuda.resize(gpu_frame, (int(1280 * scale), int(720 * scale)))
 
                 luv = cv.cuda.cvtColor(resized, cv.COLOR_BGR2LUV)
                 
@@ -39,9 +38,9 @@ def preprocess(video):
 
                 gray = cv.cuda.cvtColor(resized, cv.COLOR_BGR2GRAY)
                 
-                thresh = cv.cuda.threshold(gray, 115, 255, cv.THRESH_BINARY)
+                thresh = cv.cuda.threshold(gray, 155, 255, cv.THRESH_BINARY)
                 
-                canny = cv.Canny(gray.download(), 115, 255)
+                canny = cv.Canny(gray.download(), 155, 255)
 
 
                 # convert gray & canny to 3d arrays (so they can be dislayed with colored arrays)
@@ -57,14 +56,13 @@ def preprocess(video):
                 thresh = thresh.download()
         
                 # visualization
-                top_row = np.concatenate((resized, thresh), axis=1)
-                middle_row = np.concatenate((hsv, gray), axis=1)
-                bottom_row = np.concatenate((luv, canny), axis=1)
+                top_row = np.concatenate((resized, gray), axis=1)
+                middle_row = np.concatenate((luv, thresh), axis=1)
+                bottom_row = np.concatenate((hsv, canny), axis=1)
 
                 joined = np.concatenate((top_row, middle_row, bottom_row), axis=0)
                 
                 cv.imshow('OG | GRAY | LUV | THRESH | HSV | CANNY', joined)
-                out.write(joined)
 
                 k = cv.waitKey(1)
                 # user Esc
@@ -85,5 +83,5 @@ def preprocess(video):
     
 
 if __name__ == '__main__':
-    video = '../../media/ankles.mp4'
+    video = '../../media/corn.mp4'
     preprocess(video)
