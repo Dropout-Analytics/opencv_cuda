@@ -20,17 +20,15 @@ def preprocess(video):
         # upload this frame to GPU
         gpu_frame.upload(frame)
 
-        # do stuff
+        # resize image (numpy.ndarray -> cv2.cuda_GpuMat)
         resized = cv.cuda.resize(gpu_frame, (int(1280 * scale), int(720 * scale)))
 
+        # apply luv, hsv, and grayscale filters to resized image
         luv = cv.cuda.cvtColor(resized, cv.COLOR_BGR2LUV)
-        
         hsv = cv.cuda.cvtColor(resized, cv.COLOR_BGR2HSV)
-
         gray = cv.cuda.cvtColor(resized, cv.COLOR_BGR2GRAY)
-        
 
-        # convert gray & canny to 3d arrays (so they can be dislayed with colored arrays)
+        # convert gray to 3 channels (so they can be dislayed with colored arrays)
         gray = cv.cuda.cvtColor(gray, cv.COLOR_GRAY2BGR)
 
         # download new image(s) from GPU to CPU
