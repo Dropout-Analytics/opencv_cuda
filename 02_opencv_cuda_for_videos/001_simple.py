@@ -1,7 +1,7 @@
 import cv2 as cv
 
 # load .mp4 video
-vod = cv.VideoCapture('../../media/corn.mp4')
+vod = cv.VideoCapture('../media/corn.mp4')
 
 # read the 1st frame (ret == bool)
 ret, frame = vod.read()
