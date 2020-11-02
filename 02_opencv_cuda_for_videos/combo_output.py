@@ -79,5 +79,5 @@ def preprocess(video):
     
 
 if __name__ == '__main__':
-    video = '../../media/corn.mp4'
+    video = '../media/corn.mp4'
     preprocess(video)
